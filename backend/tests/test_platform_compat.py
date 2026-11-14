@@ -59,3 +59,15 @@ def test_gguf_only_install_switches_loader(monkeypatch):
     g = workflows.localize_loras({'1': {'class_type': 'UNETLoader', 'inputs': {'unet_name': 'minimax_h3_ref2va_pruned_int8_convrot.safetensors', 'weight_dtype': 'default'}}})
     assert g['1']['class_type'] == 'UnetLoaderGGUF'
     assert g['1']['inputs'] == {'unet_name': 'MiniMax-H3-Ref2VA-Pruned-Q8_0.gguf'}
+
+
+def test_new_combo_format_is_listed():
+    import requirements_check
+    info={'LoadBackgroundRemovalModel':{'input':{'required':{'bg_removal_name':['COMBO',{'options':['BiRefNet/birefnet.safetensors']}]}}}}
+    assert 'BiRefNet/birefnet.safetensors' in requirements_check.comfy_listed(info)
+
+
+def test_background_removal_resolves_subfolder(monkeypatch):
+    monkeypatch.setattr(workflows, 'INSTALLED', {'LoadBackgroundRemovalModel': {'BiRefNet/birefnet.safetensors'}})
+    g = workflows.localize_loras({'2': {'class_type': 'LoadBackgroundRemovalModel', 'inputs': {'bg_removal_name': 'birefnet.safetensors'}}})
+    assert g['2']['inputs']['bg_removal_name'] == 'BiRefNet/birefnet.safetensors'

@@ -72,6 +72,8 @@ LOADERS={'LoraLoaderModelOnly':'lora_name','VAELoader':'vae_name','UNETLoader':'
 # GGUF loaders (city96/ComfyUI-GGUF), listed when that pack is installed: a UNET/CLIP whose only installed copy is a
 # GGUF quantization is loaded through them (platform_compat.GGUF_LOADERS).
 LOADERS.update({'UnetLoaderGGUF':'unet_name','CLIPLoaderGGUF':'clip_name'})
+# Background removal (BiRefNet): ComfyUI may list it in a subfolder (BiRefNet/birefnet.safetensors).
+LOADERS['LoadBackgroundRemovalModel']='bg_removal_name'
 def sampling_model(g,model):
     """Point the first-pass guider and its scheduler at a patched MODEL. Pika's 6-step preset replaces the scheduler
     with ManualSigmas, which takes no model: setting one there fails the whole graph."""

@@ -50,7 +50,8 @@ def comfy_listed(info):
     for node in (info or {}).values():
         for group in ('required','optional'):
             for spec in ((node.get('input') or {}).get(group) or {}).values():
-                choices=spec[0] if isinstance(spec,(list,tuple)) and spec and isinstance(spec[0],list) else []
+                choices=spec[0] if isinstance(spec,(list,tuple)) and spec and isinstance(spec[0],list) else \
+                    spec[1].get('options',[]) if isinstance(spec,(list,tuple)) and len(spec)>1 and isinstance(spec[1],dict) else []   # ['COMBO', {'options': [...]}]
                 names.update(c.replace('\\','/') for c in choices if isinstance(c,str) and c.lower().endswith(MODEL_EXTENSIONS))
     return names
 

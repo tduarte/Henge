@@ -13,6 +13,12 @@ PORT=${COMFY_PORT:-8189}
 [ "$(uname -s)" = Darwin ] || { echo "This launcher is for macOS; see docs/RUN_LOCAL.md"; exit 1; }
 export PYTORCH_ENABLE_MPS_FALLBACK=${PYTORCH_ENABLE_MPS_FALLBACK:-1}
 export HENGE_PLATFORM=${HENGE_PLATFORM:-auto}
+# On MPS ComfyUI always uses its SHARED memory state, which runs text encoders (the 32B H3 encoder and the 9B planner)
+# on the CPU: many times slower. --gpu-only keeps them on the Apple GPU. Default on with 96 GB or more of unified
+# memory (bf16 H3 + its encoder + the planner fit); HENGE_GPU_ONLY=0/1 overrides.
+mem_gb=$(( $(sysctl -n hw.memsize) / 1073741824 ))
+extra=()
+if [ "${HENGE_GPU_ONLY:-$([ "$mem_gb" -ge 96 ] && echo 1 || echo 0)}" = 1 ]; then extra+=(--gpu-only); fi
 cd "$COMFY_DIR"
 exec "$PYTHON" main.py --listen 127.0.0.1 --port "$PORT" --preview-method taesd \
-  --use-pytorch-cross-attention "$@"
+  --use-pytorch-cross-attention ${extra[@]+"${extra[@]}"} "$@"

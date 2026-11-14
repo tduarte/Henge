@@ -59,14 +59,29 @@ python scripts/download_models.py --manifest config/model-repos.apple-silicon.js
 
 1. Install ComfyUI natively in a venv: `uv venv --python 3.13`, then `uv pip install torch torchvision
    torchaudio`, then `uv pip install -r requirements.txt`.
-2. Link the nodes as in [RUN_LOCAL.md](RUN_LOCAL.md). Use the BFSNodes fork with the MPS attention fallback,
-   and install `backend/requirements.txt` into the same venv.
+2. Link the nodes as in [RUN_LOCAL.md](RUN_LOCAL.md). Use BFSNodes at the commit the Dockerfile pins
+   (`BFS_REF`, the `tara-keyframes` line) plus the MPS attention fallback, from the fork's `apple-silicon` branch. The
+   default branch rejects TARA with carried context ("cannot be combined with ... history"). Install
+   `backend/requirements.txt` into the same venv.
 3. Start ComfyUI with `COMFY_DIR=/path/to/ComfyUI scripts/start_comfy_mac.sh`. The script runs on port 8189 with
    `--use-pytorch-cross-attention`. ComfyUI's default sub-quadratic attention on MPS can produce dark video at H3
    sequence lengths (ComfyUI #17418). The script also sets `PYTORCH_ENABLE_MPS_FALLBACK=1`, and it doesn't pass
-   `--lowvram`.
+   `--lowvram`. With 96 GB or more it adds `--gpu-only`: on MPS, ComfyUI always uses its SHARED memory state, which
+   puts text encoders (the 32B H3 encoder and the 9B planner) on the **CPU**. That was about 5x slower in testing.
+   `HENGE_GPU_ONLY=0/1` overrides this.
 4. Create `.env.local` (`COMFY_BASE_URL=http://127.0.0.1:8189`, `COMFY_ROOT`, `HENGE_DATA_DIR`), then run
    `npm ci && npm run build` and `PYTHON=/path/to/ComfyUI/.venv/bin/python scripts/local_stack.sh start`.
+
+## Measured (M5 Max, 128 GB)
+
+These come from a 2-second Motion Transfer TARA test at 480p: bf16 H3 base, nvfp4 encoder, DMAD 4-step,
+`--gpu-only`.
+
+- The planner (Qwen3.5 9B, bf16, on MPS) produces about 11 tokens/s, and the whole plan takes about 3 minutes.
+  On the CPU, its first stage alone took 115 s instead of 24 s.
+- For H3 sampling, the TARA flash partitions run through the chunked fallback at 11,924 tokens and 56 heads. That
+  is about 140 s per step, and one 4-step segment, including the decode, took 11 min 17 s.
+- In memory, the H3 base (38 GB), the encoder (15 GB) and the VAEs (about 5 GB) all stayed resident at once.
 
 ## Known limits
 
