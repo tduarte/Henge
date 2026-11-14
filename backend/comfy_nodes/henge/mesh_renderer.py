@@ -1,11 +1,12 @@
-"""CUDA z-buffer rendering with fixed identity colors and semantic face colors."""
+"""GPU z-buffer rendering (CUDA or MPS) with fixed identity colors and semantic face colors."""
 import numpy as np
 import torch
+import comfy.model_management as mm
 from comfy_extras.sam3d_body.rasterizer import _faces_to_device,_vertex_normals,_make_shade_fn,_rasterize_person
 _CACHE={}
 @torch.inference_mode()
 def render(rgb,persons,faces,underlays,face_regions):
- device=torch.device('cuda');h,w=rgb.shape[:2]
+ device=mm.get_torch_device();h,w=rgb.shape[:2]
  bg=rgb.copy()
  for mask,color in underlays or []:bg[mask]=color
  bg=torch.as_tensor(bg,device=device,dtype=torch.float32)/255

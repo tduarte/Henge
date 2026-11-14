@@ -138,6 +138,8 @@ shot instead of editing it, and a First Frame model then repeats that difference
 You need a working ComfyUI (PyTorch with CUDA 13, NVIDIA driver 580+), Node.js 22.6+, Python 3.10+ and
 `ffmpeg`/`ffprobe` on the PATH.
 
+**Apple Silicon Mac:** run natively on MPS (experimental): see [docs/APPLE_SILICON.md](docs/APPLE_SILICON.md).
+
 1. Get Henge and the nodes:
 
    ```sh

@@ -4,6 +4,7 @@ The downloader (scripts/download_models.py) writes models/.henge-downloads.json;
 this module turns it into the checklist the UI shows while the pod is preparing.
 """
 import json,os,shutil
+import platform_compat
 from pathlib import Path
 
 LEGACY_LORAS=json.loads(Path(__file__).with_name('legacy_loras.json').read_text())
@@ -60,7 +61,11 @@ def check(models_dir,models,listed=()):
     def comfy_has(relative):
         # A loader lists names relative to its folder (henge/x.safetensors for loras/henge/x.safetensors).
         rest=relative.split('/',1)[1] if '/' in relative else relative
-        return rest in listed or rest.rsplit('/',1)[-1] in listed
+        if rest in listed or rest.rsplit('/',1)[-1] in listed:return True
+        base=rest.rsplit('/',1)[-1]
+        if any(n.rsplit('/',1)[-1]==base for n in listed):return True   # same file in a subfolder (MiniMax-H3/...)
+        # The same model in another quantization (bf16, GGUF ... on Apple Silicon); LoRAs are never swapped.
+        return not relative.startswith('loras/') and platform_compat.quant_sibling(rest,listed) is not None
     by_destination={row['destination']:row for row in status.get('models',[])}
     rows={}
     def installed_path(relative):

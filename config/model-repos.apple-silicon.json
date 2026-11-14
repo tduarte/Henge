@@ -1,0 +1,446 @@
+{
+ "version": 1,
+ "models": [
+  {
+   "id": "h3",
+   "url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/diffusion_models/minimax_h3_ref2va_pruned_bf16.safetensors",
+   "destination": "diffusion_models/minimax_h3_ref2va_pruned_bf16.safetensors",
+   "profiles": [
+    "common"
+   ]
+  },
+  {
+   "id": "h3_text",
+   "url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
+   "destination": "text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
+   "profiles": [
+    "common"
+   ]
+  },
+  {
+   "id": "h3_vae",
+   "url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/vae/minimax_h3_video_vae_fp16.safetensors",
+   "destination": "vae/minimax_h3_video_vae_fp16.safetensors",
+   "profiles": [
+    "common"
+   ]
+  },
+  {
+   "id": "planner",
+   "url": "https://huggingface.co/Comfy-Org/MOSS-Image/resolve/main/text_encoders/qwen3.5_9b_bf16.safetensors",
+   "destination": "text_encoders/qwen3.5_9b_bf16.safetensors",
+   "profiles": [
+    "common"
+   ]
+  },
+  {
+   "id": "preview",
+   "url": "https://huggingface.co/Alissonerdx/Minimax-H3-ComfyUI/resolve/main/vae_approx/taeh3.safetensors",
+   "destination": "vae_approx/taeh3.safetensors",
+   "profiles": [
+    "common"
+   ],
+   "require_keys": [
+    "decoder.22.bias"
+   ],
+   "note": "Preview only (final video uses the H3 VAE). Temporal TAEH3 from madebyollin/taehv (MIT); the 2D Kijai TAEH3 crashes core TAESD previews."
+  },
+  {
+   "id": "bg_removal",
+   "url": "https://huggingface.co/Comfy-Org/BiRefNet/resolve/main/background_removal/birefnet.safetensors",
+   "destination": "background_removal/birefnet.safetensors",
+   "profiles": [
+    "common"
+   ],
+   "note": "Native ComfyUI background removal (MIT). Character Swap references get a #808080 background like the v1.1 workflow."
+  },
+  {
+   "id": "character",
+   "url": "https://huggingface.co/Alissonerdx/Minimax-H3-ComfyUI/resolve/main/loras/minimax_h3_character_swap_v1.1_ref2va_fro.safetensors",
+   "destination": "loras/henge/minimax_h3_character_swap_v1.1_ref2va_fro.safetensors",
+   "profiles": [
+    "character"
+   ]
+  },
+  {
+   "id": "character_adapter",
+   "url": "https://huggingface.co/drbaph/MiniMax-H3-Turbo-Lora-ComfyUI/resolve/main/experimental/minimax_h3_dmd_ref2va_8step_turbo_pruned.safetensors",
+   "destination": "loras/henge/minimax_h3_dmd_ref2va_8step_turbo_pruned.safetensors",
+   "profiles": [
+    "character",
+    "headswap",
+    "sharpness"
+   ]
+  },
+  {
+   "id": "turbo_pika6",
+   "repo_id": "Pika-Labs/Pika-H3-Flex",
+   "revision": "0ddf55ad7067ca1e76812253bd7b4600df87f759",
+   "filename": "comfy/loras/pika_h3_flex_ref2va_comfy_bf16.safetensors",
+   "destination": "loras/henge/pika_h3_flex_ref2va_comfy_bf16.safetensors",
+   "profiles": [
+    "common",
+    "pika",
+    "regenerate"
+   ],
+   "note": "Downloaded by default; optional turbo selection. Official Pika-Labs H3 Flex Ref2VA Comfy BF16 adapter (full rank, approximately 1.96 GB); strength 1.0, Comfy workflow uses LCM and 6 manual-sigma steps. MiniMax H3 Community License.",
+   "sha256": "e4d058fbd027377b925a0ee607b514ddd9037873fee3afa05d73b302e6f7f8e1",
+   "label": "Pika H3 Flex \u00b7 Ref2VA (Official)"
+  },
+  {
+   "id": "turbo_pika6_kijai",
+   "repo_id": "Kijai/MiniMax-H3_comfy",
+   "revision": "4c24460ce97e4c4b01acfe7ebcb7e01e1a86a234",
+   "filename": "loras/Pika/pika_h3_flex_ref2va_v1_avg_rank_55_bf16.safetensors",
+   "destination": "loras/henge/pika_h3_flex_ref2va_v1_avg_rank_55_bf16.safetensors",
+   "profiles": [
+    "common",
+    "pika"
+   ],
+   "note": "Downloaded by default; optional turbo selection. Pika H3 Flex Ref2VA adapter (Pika-Labs) reduced by Kijai to a dynamic rank (sv_fro 0.99 from 384, average 55, 553 MB instead of 1.96 GB); strength 1.0, Comfy workflow uses LCM and 6 manual-sigma steps. SHA256 7b5a7e707860412c214559666c6283cde2cddc79e13e124007fa47a5392352da. MiniMax H3 Community License.",
+   "sha256": "7b5a7e707860412c214559666c6283cde2cddc79e13e124007fa47a5392352da",
+   "label": "Pika H3 Flex \u00b7 Ref2VA (Kijai)"
+  },
+  {
+   "id": "pika_license",
+   "repo_id": "Pika-Labs/Pika-H3-Flex",
+   "revision": "0ddf55ad7067ca1e76812253bd7b4600df87f759",
+   "filename": "LICENSE",
+   "destination": "licenses/pika-h3-flex/LICENSE",
+   "profiles": [
+    "common",
+    "pika"
+   ],
+   "note": "License/notice accompanying the Pika model derivative; not an application-code license."
+  },
+  {
+   "id": "pika_notice",
+   "repo_id": "Pika-Labs/Pika-H3-Flex",
+   "revision": "0ddf55ad7067ca1e76812253bd7b4600df87f759",
+   "filename": "NOTICE",
+   "destination": "licenses/pika-h3-flex/NOTICE",
+   "profiles": [
+    "common",
+    "pika"
+   ],
+   "note": "License/notice accompanying the Pika model derivative; not an application-code license."
+  },
+  {
+   "id": "pika_upstream_license",
+   "repo_id": "Pika-Labs/Pika-H3-Flex",
+   "revision": "0ddf55ad7067ca1e76812253bd7b4600df87f759",
+   "filename": "licenses/MiniMax-H3-LICENSE.txt",
+   "destination": "licenses/pika-h3-flex/MiniMax-H3-LICENSE.txt",
+   "profiles": [
+    "common",
+    "pika"
+   ],
+   "note": "License/notice accompanying the Pika model derivative; not an application-code license."
+  },
+  {
+   "id": "turbo_dmad4",
+   "url": "https://huggingface.co/Kijai/MiniMax-H3-experimental/resolve/main/loras/minimax_h3_DMAD_4step_full_lora_avg_rank_39_bf16.safetensors",
+   "destination": "loras/henge/minimax_h3_DMAD_4step_full_lora_avg_rank_39_bf16.safetensors",
+   "profiles": [
+    "character",
+    "headswap",
+    "sharpness",
+    "regenerate"
+   ],
+   "note": "Optional turbo LoRA (4 steps)."
+  },
+  {
+   "id": "turbo_pdmd4",
+   "url": "https://huggingface.co/Kijai/MiniMax-H3-experimental/resolve/main/loras/minimax_h3_pdmd_4step_lora_avg_rank_57_bf16.safetensors",
+   "destination": "loras/henge/minimax_h3_pdmd_4step_lora_avg_rank_57_bf16.safetensors",
+   "profiles": [
+    "character",
+    "headswap",
+    "sharpness"
+   ],
+   "note": "Optional turbo LoRA (4 steps, experimental)."
+  },
+  {
+   "id": "turbo_pdmd2",
+   "url": "https://huggingface.co/Kijai/MiniMax-H3-experimental/resolve/main/loras/minimax_h3_pdmd_2step_lora_avg_rank_38_bf16.safetensors",
+   "destination": "loras/henge/minimax_h3_pdmd_2step_lora_avg_rank_38_bf16.safetensors",
+   "profiles": [
+    "character",
+    "headswap",
+    "sharpness"
+   ],
+   "note": "Optional turbo LoRA (2 steps, experimental)."
+  },
+  {
+   "id": "turbo_lightx8",
+   "url": "https://huggingface.co/lightx2v/Minimax-h3-Turbo/resolve/main/minimax_h3_ref2v_turbo_8step_v1.1_768p_comfyui_bf16.safetensors",
+   "destination": "loras/henge/minimax_h3_ref2v_turbo_8step_v1.1_768p_comfyui_bf16.safetensors",
+   "profiles": [
+    "character",
+    "headswap",
+    "sharpness"
+   ],
+   "note": "Optional turbo LoRA (8 steps)."
+  },
+  {
+   "id": "turbo_lightx4",
+   "url": "https://huggingface.co/lightx2v/Minimax-h3-Turbo/resolve/main/minimax_h3_ref2v_turbo_4step_v1.0_768p_comfyui_bf16.safetensors",
+   "destination": "loras/henge/minimax_h3_ref2v_turbo_4step_v1.0_768p_comfyui_bf16.safetensors",
+   "profiles": [
+    "character",
+    "headswap",
+    "sharpness"
+   ],
+   "note": "Optional turbo LoRA (4 steps)."
+  },
+  {
+   "id": "headswap",
+   "url": "https://huggingface.co/Alissonerdx/Minimax-H3-ComfyUI/resolve/main/loras/minimax_h3_head_swap_v1.0_r32.safetensors",
+   "destination": "loras/henge/minimax_h3_head_swap_v1.0_r32.safetensors",
+   "profiles": [
+    "headswap"
+   ]
+  },
+  {
+   "id": "motion_transfer_v1",
+   "url": "https://huggingface.co/Alissonerdx/Minimax-H3-ComfyUI/resolve/main/loras/minimax_h3_motion_transfer_v1.0_ref2va.safetensors",
+   "destination": "loras/henge/minimax_h3_motion_transfer_v1.0_ref2va.safetensors",
+   "size": 184840504,
+   "note": "Training adapter V2 merged in (exact rank concat, then per-module SVD keeping 99% of the Frobenius energy), 185 MB. The size marks this release: an older copy under the same name is replaced.",
+   "profiles": [
+    "motion_transfer"
+   ]
+  },
+  {
+   "id": "motion_transfer_tara_v1",
+   "url": "https://huggingface.co/Alissonerdx/Minimax-H3-ComfyUI/resolve/main/loras/minimax_h3_motion_transfer_tara_v1.0_ref2va.safetensors",
+   "destination": "loras/henge/minimax_h3_motion_transfer_tara_v1.0_ref2va.safetensors",
+   "size": 126417912,
+   "note": "Training adapter V2 merged in (exact rank concat, then per-module SVD keeping 99% of the Frobenius energy), 126 MB. The size marks this release: an older copy under the same name is replaced.",
+   "profiles": [
+    "motion_transfer_tara"
+   ]
+  },
+  {
+   "id": "turbo_solar4",
+   "url": "https://huggingface.co/Alissonerdx/Minimax-H3-ComfyUI/resolve/main/loras/solarrenderer/solarrenderer_4step_comfy_fro_dyn99.safetensors",
+   "destination": "loras/henge/solarrenderer_4step_comfy_fro_dyn99.safetensors",
+   "profiles": [
+    "solar",
+    "ffp"
+   ],
+   "note": "Turbo LoRA (4 steps): SolarRenderer 4-step converted to ComfyUI H3 keys and compressed (per-module SVD keeping 99% of the Frobenius energy, 1.4 GB; a volume with the full-rank file keeps using it). An optional speed LoRA, selectable in Advanced > Turbo LoRA; the First Frame model does not need it, it runs on the standard DMAD 4-step turbo."
+  },
+  {
+   "id": "klein3_text_encoder",
+   "url": "https://huggingface.co/Comfy-Org/Fibo-2.0/resolve/main/text_encoders/qwen3vl_4b_int8_convrot.safetensors",
+   "destination": "text_encoders/qwen3vl_4b_int8_convrot.safetensors",
+   "profiles": [
+    "fibo",
+    "klein3"
+   ],
+   "note": "Qwen3-VL 4B encoder, shared by the default FIBO 2.0 editor and by FLUX.3 [image klein]."
+  },
+  {
+   "id": "fibo_diffusion_models",
+   "url": "https://huggingface.co/Comfy-Org/Fibo-2.0/resolve/main/diffusion_models/fibo2_edit_turbo_int8_convrot.safetensors",
+   "destination": "diffusion_models/fibo2_edit_turbo_int8_convrot.safetensors",
+   "profiles": [
+    "fibo"
+   ],
+   "note": "FIBO 2.0 edit turbo (briaai, int8): Henge's default image editor for first-frame and reference edits. It edits the frame it is given instead of re-drawing it, which is what the First Frame model needs. 4 steps."
+  },
+  {
+   "id": "flux_image_vae",
+   "url": "https://huggingface.co/Comfy-Org/Fibo-2.0/resolve/main/vae/flux2-vae.safetensors",
+   "destination": "vae/flux2-vae.safetensors",
+   "profiles": [
+    "fibo",
+    "klein",
+    "klein3"
+   ],
+   "note": "FLUX.2 VAE, shared by FIBO 2.0 and both FLUX Klein editors."
+  },
+  {
+   "id": "qwen21_diffusion_models",
+   "url": "https://huggingface.co/Comfy-Org/Qwen-Image-2.1/resolve/main/diffusion_models/qwen_image_2.1_turbo_int8_convrot.safetensors",
+   "destination": "diffusion_models/qwen_image_2.1_turbo_int8_convrot.safetensors",
+   "profiles": [
+    "qwen21"
+   ],
+   "note": "Optional Qwen-Image 2.1 Turbo (Qwen, int8): the strongest instruction-following editor, selectable in the First Frame modal. 8 steps. The plain (non-distilled) checkpoint works too and runs at 24 steps."
+  },
+  {
+   "id": "qwen21_text_encoder",
+   "url": "https://huggingface.co/Comfy-Org/Qwen-Image-2.1/resolve/main/text_encoders/qwen3vl_8b_int8_convrot.safetensors",
+   "destination": "text_encoders/qwen3vl_8b_int8_convrot.safetensors",
+   "profiles": [
+    "qwen21"
+   ]
+  },
+  {
+   "id": "qwen21_vae",
+   "url": "https://huggingface.co/Comfy-Org/Qwen-Image-2.1/resolve/main/vae/qwen_image_2.1_vae_bf16.safetensors",
+   "destination": "vae/qwen_image_2.1_vae_bf16.safetensors",
+   "profiles": [
+    "qwen21"
+   ]
+  },
+  {
+   "id": "qwen21_turbo_lora",
+   "url": "https://huggingface.co/Comfy-Org/Qwen-Image-2.1/resolve/main/loras/p_q_image_2.1_5_steps_v0.1_comfyui_bf16.safetensors",
+   "destination": "loras/henge/p_q_image_2.1_5_steps_v0.1_comfyui_bf16.safetensors",
+   "profiles": [
+    "qwen21"
+   ],
+   "note": "5-step turbo LoRA (335 MB) for the plain Qwen-Image 2.1 checkpoint: with it Henge runs 5 steps at CFG 1 instead of 24, so the fast edit does not need the 7.3 GB Turbo checkpoint."
+  },
+  {
+   "id": "bfs_body_swap_qwen21",
+   "url": "https://huggingface.co/Alissonerdx/BFS-Best-Face-Swap/resolve/main/bfs_body_swap_v1.0_qwen_2.1.safetensors",
+   "destination": "loras/henge/bfs_body_swap_v1.0_qwen_2.1.safetensors",
+   "profiles": [
+    "qwen21"
+   ],
+   "note": "BFS Body Swap V1.0 for Qwen-Image 2.1 (MIT): the Character Swap First Frame editor. Replaces the clicked person with the character picture, keeping pose, framing and light."
+  },
+  {
+   "id": "h3image_lora",
+   "url": "https://huggingface.co/PrunaAI/P-H3-Image-Comfy/resolve/main/loras/p-h3-image_lora_bf16.safetensors",
+   "destination": "loras/henge/p-h3-image_lora_bf16.safetensors",
+   "profiles": [
+    "h3image"
+   ],
+   "note": "PrunaAI P-H3-Image LoRA (Apache-2.0): turns the H3 DiT Henge already uses into an image editor, the H3 Image frame editor."
+  },
+  {
+   "id": "h3image_vae",
+   "url": "https://huggingface.co/PrunaAI/P-H3-Image-Comfy/resolve/main/vae/p-h3-image_vae_bf16.safetensors",
+   "destination": "vae/p-h3-image_vae_bf16.safetensors",
+   "profiles": [
+    "h3image"
+   ],
+   "note": "PrunaAI P-H3-Image VAE (Apache-2.0): decodes the single frames of the H3 Image frame editor."
+  },
+  {
+   "id": "bfs_body_swap_selective_qwen21",
+   "url": "https://huggingface.co/Alissonerdx/BFS-Best-Face-Swap/resolve/main/bfs_body_swap_selective_magenta_v1.0_qwen_2.1.safetensors",
+   "destination": "loras/henge/bfs_body_swap_selective_magenta_v1.0_qwen_2.1.safetensors",
+   "profiles": [
+    "qwen21"
+   ],
+   "note": "BFS Body Swap Selective (Magenta) V1.0 for Qwen-Image 2.1 (MIT): replaces only the clicked person of a multi-person frame (clean frame + magenta-marked frame + character), keeping everyone else, the pose, head angle and expression."
+  },
+  {
+   "id": "klein_text_encoder",
+   "url": "https://huggingface.co/Comfy-Org/Flux-2-Klein-4B/resolve/main/split_files/text_encoders/qwen_3_4b.safetensors",
+   "destination": "text_encoders/qwen_3_4b.safetensors",
+   "profiles": [
+    "klein"
+   ]
+  },
+  {
+   "id": "klein3_diffusion_models",
+   "url": "https://huggingface.co/black-forest-labs/flux-3-image-klein-comfy/resolve/main/diffusion_models/flux3-image-klein-int8-convrot.safetensors",
+   "destination": "diffusion_models/flux3-image-klein-int8-convrot.safetensors",
+   "profiles": [
+    "klein3"
+   ],
+   "note": "Optional FLUX.3 [image klein] (Black Forest Labs, FLUX Kommunity License). Gated: accept the license at https://huggingface.co/black-forest-labs/flux-3-image-klein-comfy and set HF_TOKEN. Last choice: it samples an empty latent at about a megapixel, so it re-draws the frame instead of editing it."
+  },
+  {
+   "id": "sam31",
+   "url": "https://huggingface.co/Comfy-Org/SAM3.1/resolve/main/checkpoints/sam3.1_multiplex_fp16.safetensors",
+   "destination": "checkpoints/sam3.1_multiplex_fp16.safetensors",
+   "profiles": [
+    "sam2d",
+    "sam3d"
+   ]
+  },
+  {
+   "id": "sam3d",
+   "url": "https://huggingface.co/Comfy-Org/sam-3d-body/resolve/main/detection/sam_3d_body_dinov3_bf16.safetensors",
+   "destination": "detection/sam_3d_body_dinov3_bf16.safetensors",
+   "profiles": [
+    "sam3d"
+   ]
+  },
+  {
+   "id": "moge",
+   "url": "https://huggingface.co/Comfy-Org/MoGe/resolve/main/geometry_estimation/moge_2_vitl_normal_fp16.safetensors",
+   "destination": "geometry_estimation/moge_2_vitl_normal_fp16.safetensors",
+   "profiles": [
+    "sam3d",
+    "solar",
+    "ffp"
+   ],
+   "note": "MoGe-2 ViT-L with normals (ComfyUI core). SAM 3D Body reads the camera from it; Motion Transfer SolarRenderer FFP turns the guide into a surface-normal map with it."
+  },
+  {
+   "id": "audio",
+   "url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/vae/minimax_h3_audio_vae_fp32.safetensors",
+   "destination": "vae/minimax_h3_audio_vae_fp32.safetensors",
+   "profiles": [
+    "audio"
+   ]
+  },
+  {
+   "id": "ffp",
+   "url": "https://huggingface.co/Alissonerdx/Minimax-H3-ComfyUI/resolve/main/loras/minimax_h3_motion_transfer_ffp_v1.0_ref2va.safetensors",
+   "destination": "loras/henge/minimax_h3_motion_transfer_ffp_v1.0_ref2va.safetensors",
+   "sha256": "4c38bb2685af503e890bbae70a0aaa7cfc0241d98166771f637b726f57a09ee8",
+   "profiles": [
+    "ffp"
+   ],
+   "note": "Motion Transfer FFP v1.0 (220 MB): the VFX Edit first-frame LoRA (rank 128) x1.0 + SolarRenderer control x0.5, rank concat with per-module SVD keeping 99% of the Frobenius energy. The studio selects it whenever a First Frame is attached; it runs on the standard DMAD 4-step turbo."
+  },
+  {
+   "id": "solar_control",
+   "url": "https://huggingface.co/Alissonerdx/Minimax-H3-ComfyUI/resolve/main/loras/solarrenderer/solarrenderer_control_comfy_fro_dyn99.safetensors",
+   "destination": "loras/henge/solarrenderer_control_comfy_fro_dyn99.safetensors",
+   "profiles": [
+    "ffp",
+    "solar"
+   ],
+   "note": "Motion Transfer SolarRenderer FFP v1.0: SolarRenderer's control LoRA (Enderfga/SolarRenderer, MiniMax H3 Community License) converted to ComfyUI H3 keys and compressed (per-module SVD keeping 99% of the Frobenius energy, 757 MB; the full-rank 5.9 GB file is used when a volume already has it). Used alone, on SolarRenderer's own conditioning, for clips that start from an edited first frame."
+  },
+  {
+   "id": "sharpness",
+   "url": "https://huggingface.co/Alissonerdx/Minimax-H3-ComfyUI/resolve/main/loras/minimax_h3_lms_v1.0_r64.safetensors",
+   "destination": "loras/henge/minimax_h3_lms_v1.0_r64.safetensors",
+   "profiles": [
+    "sharpness",
+    "regenerate"
+   ],
+   "note": "LMS sharpness LoRA extracted with Frobenius/SVD (dyn95)."
+  },
+  {
+   "id": "latent_upscaler",
+   "url": "https://huggingface.co/Alissonerdx/Minimax-H3-ComfyUI/resolve/main/latent_upscaler/h3_upscaler_lms_v0.1.safetensors",
+   "destination": "latent_upscale_models/h3_upscaler_lms_v0.1.safetensors",
+   "profiles": [
+    "sharpness"
+   ],
+   "note": "MiniMax H3 3D latent upscaler (LBH-123-AI base, MIT) fine-tuned on the LMS data, for the Sharpness H3 2K/4K upscale."
+  },
+  {
+   "id": "regenerate_refiner_rank16",
+   "url": "https://huggingface.co/Kijai/MiniMax-H3-experimental/resolve/f5c3b1d5a63e008a691fca1b6096fd57a5307536/loras/minimax_h3_open_regenerate_2k_refiner_rank_16_bf16.safetensors",
+   "destination": "loras/henge/minimax_h3_open_regenerate_2k_refiner_rank_16_bf16.safetensors",
+   "profiles": [
+    "regenerate"
+   ],
+   "note": "Kijai rank-16 refiner ONLY. LMS and turbo are not merged into this file."
+  },
+  {
+   "id": "regenerate_native_upscaler",
+   "url": "https://huggingface.co/LBH-123-AI/Minimax_h3_latent_Upscaler/resolve/3f941d5d182014dd5c0a5e16330420ee2d4aa0c6/minimax_h3_latent_upscaler_3d_conv_v1/minimax_h3_latent_upscaler_3d_conv_v1_bf16.safetensors",
+   "destination": "latent_upscale_models/minimax_h3_latent_upscaler_3d_conv_v1_bf16.safetensors",
+   "profiles": [
+    "regenerate"
+   ],
+   "note": "Native ComfyUI MiniMaxH3LatentUpscaleWithModel checkpoint."
+  }
+ ],
+ "_comment": "Apple Silicon (MPS) variant of model-repos.example.json. H3 base in bf16 (no per-step int8 dequantization; 40 GB), the H3 text encoder as nvfp4_awq (emulated on MPS; swap for qwen3vl_32b_minimax_h3_int8_convrot if it fails), the planner in bf16, and no fp8 FLUX.2 Klein (MPS cannot cast float8). The bridge also accepts the published int8_convrot names: platform_compat.quant_sibling() maps each to whichever quantization is installed."
+}

@@ -386,8 +386,10 @@ def unload_upscale_model(name, device, precision):
     if model is not None and str(next(model.parameters()).device) != "cpu":
         model.to("cpu")
         print(f"[Henge upscale] Offloaded upscale model: {name}")
-    if str(device) == "cuda":
+    if str(device).startswith("cuda"):
         torch.cuda.empty_cache()
+    elif str(device).startswith("mps") and torch.backends.mps.is_available():
+        torch.mps.empty_cache()
 
 
 def _compute_upscale_target(width, height, h_in, w_in):
@@ -407,6 +409,18 @@ def _compute_upscale_target(width, height, h_in, w_in):
     return h_out, w_out, eff
 
 
+def _device_available(device):
+    """True when the requested torch device exists here (CUDA, Apple MPS or CPU)."""
+    name = str(device)
+    if name == "cpu":
+        return True
+    if name.startswith("cuda"):
+        return torch.cuda.is_available()
+    if name.startswith("mps"):
+        return torch.backends.mps.is_available()
+    return False
+
+
 def upscale_video(video, param):
     """Upscale one chunk's video latent with the H3 3D upscaler. Audio untouched.
 
@@ -420,7 +434,7 @@ def upscale_video(video, param):
     precision = param["precision"]
 
     orig_dtype = video.dtype
-    dev = torch.device(device if (device == "cpu" or torch.cuda.is_available()) else "cpu")
+    dev = torch.device(device if _device_available(device) else "cpu")
     compute_dtype = {"fp32": torch.float32, "fp16": torch.float16, "bf16": torch.bfloat16}[precision]
 
     _, c, t, h_in, w_in = video.shape

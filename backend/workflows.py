@@ -1,7 +1,9 @@
 """API graphs based on the published Character Swap v1.1 native workflow.
 Only branches selected in a validated plan are added: unused loaders never execute.
 """
-import json,math
+import json
+import math
+import platform_compat
 from pathlib import Path
 # The model an attached First Frame defaults to: Motion Transfer FFP v1.0 (the profile key predates the name and stays
 # so jobs and settings shared earlier keep resolving).
@@ -67,6 +69,9 @@ LEGACY_LORAS=json.loads((Path(__file__).with_name('legacy_loras.json')).read_tex
 # under an old short name or in another subfolder (e.g. vae/minimax/…), so nothing is downloaded twice.
 INSTALLED={}
 LOADERS={'LoraLoaderModelOnly':'lora_name','VAELoader':'vae_name','UNETLoader':'unet_name','CLIPLoader':'clip_name','LatentUpscaleModelLoader':'model_name'}
+# GGUF loaders (city96/ComfyUI-GGUF), listed when that pack is installed: a UNET/CLIP whose only installed copy is a
+# GGUF quantization is loaded through them (platform_compat.GGUF_LOADERS).
+LOADERS.update({'UnetLoaderGGUF':'unet_name','CLIPLoaderGGUF':'clip_name'})
 def sampling_model(g,model):
     """Point the first-pass guider and its scheduler at a patched MODEL. Pika's 6-step preset replaces the scheduler
     with ManualSigmas, which takes no model: setting one there fails the whole graph."""
@@ -85,6 +90,10 @@ def resolve_model(node,name,installed=None):
         base=candidate.rsplit('/',1)[-1]
         hits=sorted(n for n in names if n.replace('\\','/').rsplit('/',1)[-1]==base)
         if hits:return hits[0]
+    # The same model in another quantization (e.g. bf16 or GGUF on a Mac instead of the published int8_convrot).
+    if node not in ('LoraLoaderModelOnly',):
+        sibling=platform_compat.quant_sibling(name,names)
+        if sibling:return sibling
     return name
 def lora_installed(name,installed=None):
     names=INSTALLED.get('LoraLoaderModelOnly',set()) if installed is None else installed
@@ -92,7 +101,17 @@ def lora_installed(name,installed=None):
 def localize_loras(graph):
     for n in graph.values():
         key=LOADERS.get(n.get('class_type'))
-        if key and isinstance(n.get('inputs',{}).get(key),str):n['inputs'][key]=resolve_model(n['class_type'],n['inputs'][key])
+        if key and isinstance(n.get('inputs',{}).get(key),str):
+            name=n['inputs'][key];resolved=resolve_model(n['class_type'],name)
+            gguf=platform_compat.GGUF_LOADERS.get(n['class_type'])
+            if gguf and resolved not in INSTALLED.get(n['class_type'],set()):
+                hit=platform_compat.quant_sibling(name,INSTALLED.get(gguf[0],set()))
+                if hit:   # only a GGUF copy is installed: switch the node to the GGUF loader (same output)
+                    n['class_type']=gguf[0];n['inputs'][gguf[1]]=hit
+                    if gguf[0]=='UnetLoaderGGUF':n['inputs'].pop('weight_dtype',None)
+                    else:n['inputs'].pop('device',None)
+                    continue
+            n['inputs'][key]=resolved
     return graph
 # Base diffusion models.
 BASES={

@@ -12,11 +12,20 @@ case $PYTHON in /*) ;; */*) PYTHON=$ROOT/$PYTHON ;; esac
 UI_PORT=${UI_PORT:-8188}
 BRIDGE_PORT=${BRIDGE_PORT:-8766}
 
+# PIDs listening on a TCP port: ss on Linux, lsof on macOS (no ss there).
+port_pids() {
+  if command -v ss >/dev/null 2>&1; then
+    ss -ltnpH "sport = :$1" 2>/dev/null | sed -n 's/.*pid=\([0-9]*\).*/\1/p' | sort -u || true
+  else
+    lsof -nP -iTCP:"$1" -sTCP:LISTEN -t 2>/dev/null | sort -u || true
+  fi
+}
+
 stop_one() {  # name port
   local f=$RUN/$1.pid pids
-  pids="$( [ -f "$f" ] && cat "$f" ) $(ss -ltnpH "sport = :$2" 2>/dev/null | grep -oP 'pid=\K[0-9]+' | sort -u || true)"
+  pids="$( [ -f "$f" ] && cat "$f" ) $(port_pids "$2")"
   for pid in $pids; do kill "$pid" 2>/dev/null || true; done
-  for _ in $(seq 1 10); do ss -ltnH "sport = :$2" | grep -q . || break; sleep 1; done
+  for _ in $(seq 1 10); do [ -n "$(port_pids "$2")" ] || break; sleep 1; done
   rm -f "$f"
 }
 

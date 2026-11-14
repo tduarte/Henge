@@ -10,6 +10,7 @@ from fastapi import FastAPI,Request,HTTPException
 from fastapi.responses import FileResponse,Response
 from PIL import Image,ImageDraw,ImageFont,ImageOps
 import workflows
+import platform_compat
 import workflow_export
 import moving_plate
 import app_updates
@@ -355,26 +356,31 @@ def comfy_info(path='/object_info',timeout=10):
     if path=='/object_info' and LAST_INFO['url']==URL and LAST_INFO['info']:return LAST_INFO['info']
     return api('GET',path,timeout=timeout)
 
+def has_model(info,loader,key,name):
+    """ComfyUI lists this model, or the same model under another name, subfolder or quantization (resolve_model)."""
+    names=set(comfy_choices(info,loader,key))
+    return workflows.resolve_model(loader,name,names) in names
+
 def klein_available(info=None):
     """FLUX.2 [klein] 4B: native Flux 2 nodes plus its model, text encoder and VAE."""
     try:info=comfy_info() if info is None else info
     except Exception:return False
-    return all(n in info for n in ('ReferenceLatent','Flux2Scheduler','EmptyFlux2LatentImage')) and KLEIN['unet'] in comfy_choices(info,'UNETLoader','unet_name') \
-        and KLEIN['clip'] in comfy_choices(info,'CLIPLoader','clip_name')
+    return all(n in info for n in ('ReferenceLatent','Flux2Scheduler','EmptyFlux2LatentImage')) and has_model(info,'UNETLoader','unet_name',KLEIN['unet']) \
+        and has_model(info,'CLIPLoader','clip_name',KLEIN['clip'])
 
 def klein3_available(info=None):
     """FLUX.3 [image klein], optional (gated download): its model and the shared Qwen3-VL 4B text encoder."""
     try:info=comfy_info() if info is None else info
     except Exception:return False
-    return 'ReferenceMultiLatent' in info and KLEIN3['unet'] in comfy_choices(info,'UNETLoader','unet_name') \
-        and KLEIN3['clip'] in comfy_choices(info,'CLIPLoader','clip_name')
+    return 'ReferenceMultiLatent' in info and has_model(info,'UNETLoader','unet_name',KLEIN3['unet']) \
+        and has_model(info,'CLIPLoader','clip_name',KLEIN3['clip'])
 
 def fibo_available(info=None):
     """FIBO 2.0 edit turbo: the core TextEncodeFibo2 node plus its model, text encoder and VAE."""
     try:info=comfy_info() if info is None else info
     except Exception:return False
-    return 'TextEncodeFibo2' in info and FIBO['unet'] in comfy_choices(info,'UNETLoader','unet_name') \
-        and FIBO['clip'] in comfy_choices(info,'CLIPLoader','clip_name')
+    return 'TextEncodeFibo2' in info and has_model(info,'UNETLoader','unet_name',FIBO['unet']) \
+        and has_model(info,'CLIPLoader','clip_name',FIBO['clip'])
 
 def qwen21_available(info=None):
     """Qwen-Image 2.1 (Turbo preferred, the plain build works too), its Qwen3-VL 8B encoder and its VAE."""
@@ -382,7 +388,7 @@ def qwen21_available(info=None):
     except Exception:return False
     listed=comfy_choices(info,'UNETLoader','unet_name')
     return 'TextEncodeQwenImage21' in info and any(m in listed for m in (QWEN21['unet'],QWEN21['base'])) \
-        and QWEN21['clip'] in comfy_choices(info,'CLIPLoader','clip_name') and QWEN21['vae'] in comfy_choices(info,'VAELoader','vae_name')
+        and has_model(info,'CLIPLoader','clip_name',QWEN21['clip']) and has_model(info,'VAELoader','vae_name',QWEN21['vae'])
 
 def qwen21_model(info=None):
     """Which Qwen-Image 2.1 checkpoint to load: the Turbo build when installed (8 steps), else the plain one."""
@@ -412,8 +418,8 @@ EDITOR_GRAPHS={'h3image':h3image_graph,'fibo':fibo_graph,'klein':klein_graph,'kl
 def bfs_available(info):return qwen21_available(info) and BFS['lora'] in comfy_choices(info,'LoraLoaderModelOnly','lora_name')
 def h3image_available(info):
     """H3 Image: the H3 base Henge renders with, the P-H3-Image LoRA and VAE, and ComfyUI's PH3ImageConditioning."""
-    return ('PH3ImageConditioning' in info and BASES['h3']['unet'] in comfy_choices(info,'UNETLoader','unet_name')
-            and H3IMAGE['lora'] in comfy_choices(info,'LoraLoaderBypassModelOnly','lora_name') and H3IMAGE['vae'] in comfy_choices(info,'VAELoader','vae_name'))
+    return ('PH3ImageConditioning' in info and has_model(info,'UNETLoader','unet_name',BASES['h3']['unet'])
+            and H3IMAGE['lora'] in comfy_choices(info,'LoraLoaderBypassModelOnly','lora_name') and has_model(info,'VAELoader','vae_name',H3IMAGE['vae']))
 def h3image_swap_ready(info=None):
     """H3 Image swaps with the Character Swap LoRA when the Molmo2 H3 encoder node (ComfyUI-Molmo2-H3) is installed."""
     try:info=comfy_info() if info is None else info
@@ -537,6 +543,8 @@ def posix_inputs(graph):
 def execute_graph(job,graph,stage):
     known_loras();graph=posix_inputs(localize_loras(graph))
     if REMOTE:return execute_serverless(job,graph,stage)
+    # A ComfyUI on Apple Silicon (MPS) or CPU has no CUDA kernels: swap them for PyTorch attention (platform_compat).
+    graph=platform_compat.adapt(graph,platform_compat.device_type(URL))
     # A ComfyUI on this machine needs the GPU: a warm Molmo2 leaves it first.
     if urlsplit(URL).hostname in ('127.0.0.1','localhost','::1'):molmo_pointing.release()
     import aiohttp
@@ -1668,9 +1676,9 @@ def health():
     if installed:workflows.INSTALLED={**workflows.INSTALLED,**{n:set(comfy_choices(info,n,key)) for n,key in workflows.LOADERS.items()}}
     # SolarRenderer's structure is a MoGe-2 normal map. An inventory from an older worker does not list MoGe's files: unknown.
     normals_ready='model_name' not in info.get('LoadMoGeModel',{}).get('input',{}).get('required',{}) or SOLAR_NORMALS in comfy_choices(info,'LoadMoGeModel','model_name')
-    models={key:{**value,'available':unknown or (lora_installed(value['lora'],installed) or any(lora_installed(a,installed) for a in value.get('lora_alternatives',[]))) and lora_installed(value['adapter'],installed) and (not value.get('unet') or value['unet'] in unets) and (value.get('conditioning')!='solar' or normals_ready) and mode_ready[key]} for key,value in MODELS.items()}
+    models={key:{**value,'available':unknown or (lora_installed(value['lora'],installed) or any(lora_installed(a,installed) for a in value.get('lora_alternatives',[]))) and lora_installed(value['adapter'],installed) and (not value.get('unet') or workflows.resolve_model('UNETLoader',value['unet'],set(unets)) in unets) and (value.get('conditioning')!='solar' or normals_ready) and mode_ready[key]} for key,value in MODELS.items()}
     turbos={key:{'label':value['label'],'steps':value['steps'],'available':unknown or lora_installed(value['lora'],installed)} for key,value in TURBOS.items()}
-    bases={key:{'label':value['label'],'available':unknown or (value['unet'] in unets and (not value.get('lora') or lora_installed(value['lora'],installed)))} for key,value in BASES.items()}
+    bases={key:{'label':value['label'],'available':unknown or (workflows.resolve_model('UNETLoader',value['unet'],set(unets)) in unets and (not value.get('lora') or lora_installed(value['lora'],installed)))} for key,value in BASES.items()}
     # Sharpness 2K/4K upscalers (henge/upscale.py): H3 needs a latent upscaler checkpoint, NVIDIA the nvidia-vfx SDK.
     upscalers={'h3':unknown or any(m in comfy_choices(info,'HengeH3LatentUpscale','model_name') for m in H3_UPSCALERS),'nvidia':unknown or 'HengeRTXUpscale' in info}
     regenerate=regenerate_requirements(info)
